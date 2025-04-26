@@ -42,3 +42,15 @@ def patch_book(db: Session, book_id: int, book_update: schemas.BookUpdate):
     db.commit()
     db.refresh(book)
     return book
+
+
+def create_review(db: Session, book_id: int, review: schemas.ReviewCreate):
+    db_review = models.Review(**review.dict(), book_id=book_id)
+    db.add(db_review)
+    db.commit()
+    db.refresh(db_review)
+    return db_review
+
+
+def get_reviews_for_book(db: Session, book_id: int):
+    return db.query(models.Review).filter(models.Review.book_id == book_id).all()

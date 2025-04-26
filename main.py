@@ -71,3 +71,13 @@ def patch_book(book_id: int, book_update: schemas.BookUpdate,
     if patched_book is None:
         raise HTTPException(status_code=404, detail="Book not found")
     return patched_book
+
+
+@app.post("/books/{book_id}/reviews/", response_model=schemas.Review)
+def create_review_for_book(book_id: int, review: schemas.ReviewCreate, db: Session = Depends(get_db)):
+    return crud.create_review(db=db, book_id=book_id, review=review)
+
+
+@app.get("/books/{book_id}/reviews/", response_model=List[schemas.Review])
+def read_reviews_for_book(book_id: int, db: Session = Depends(get_db)):
+    return crud.get_reviews_for_book(db=db, book_id=book_id)
