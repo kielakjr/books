@@ -70,3 +70,54 @@ def create_review(db: Session, book_id: int, review: schemas.ReviewCreate):
 
 def get_reviews_for_book(db: Session, book_id: int):
     return db.query(models.Review).filter(models.Review.book_id == book_id).all()
+
+
+def patch_review(db: Session, review_id: int, review_patch: schemas.ReviewUpdate):
+    db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if db_review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    book = db.query(models.Book).filter(models.Book.id == db_review.book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    for key, value in review_patch.model_dump(exclude_unset=True).items():
+        setattr(db_review, key, value)
+
+    db.commit()
+    db.refresh(db_review)
+
+    reviews = db.query(models.Review).filter(models.Review.book_id == book.id).all()
+    if reviews:
+        average_rating = sum(r.rating for r in reviews) / len(reviews)
+        book.rating = round(average_rating, 2)
+    else:
+        book.rating = None
+
+    db.commit()
+    db.refresh(book)
+
+    return db_review
+
+
+def delete_review(db: Session, review_id: int):
+    db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if db_review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    book = db.query(models.Book).filter(models.Book.id == db_review.book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    db.delete(db_review)
+    db.commit()
+
+    reviews = db.query(models.Review).filter(models.Review.book_id == book.id).all()
+    if reviews:
+        average_rating = sum(r.rating for r in reviews) / len(reviews)
+        book.rating = round(average_rating, 2)
+    else:
+        book.rating = None
+
+    db.commit()
+    db.refresh(book)
+
+    return db_review

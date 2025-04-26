@@ -81,3 +81,13 @@ def create_review_for_book(book_id: int, review: schemas.ReviewCreate, db: Sessi
 @app.get("/books/{book_id}/reviews/", response_model=List[schemas.Review])
 def read_reviews_for_book(book_id: int, db: Session = Depends(get_db)):
     return crud.get_reviews_for_book(db=db, book_id=book_id)
+
+
+@app.patch("/reviews/{review_id}", response_model=schemas.Review)
+def patch_review(review_id: int, review: schemas.ReviewUpdate, db: Session = Depends(get_db)):
+    return crud.patch_review(db, review_id, review)
+
+
+@app.delete("/reviews/{review_id}", response_model=schemas.Review)
+def delete_review(review_id: int, db: Session = Depends(get_db)):
+    return crud.delete_review(db, review_id)

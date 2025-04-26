@@ -33,6 +33,11 @@ class ReviewCreate(ReviewBase):
     pass
 
 
+class ReviewUpdate(BaseModel):
+    comment: str | None = None
+    rating: int | None = None
+
+
 class Review(ReviewBase):
     id: int
     book_id: int
