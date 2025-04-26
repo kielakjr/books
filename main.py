@@ -47,10 +47,10 @@ def remove_book(book_id: int, db: Session = Depends(get_db)):
     return book
 
 
-@app.put("/books/{book_id}", response_model=schemas.Book)
-def update_book(book_id: int, book_update: schemas.BookUpdate,
-                db: Session = Depends(get_db)):
-    updated_book = crud.update_book(db, book_id, book_update)
-    if updated_book is None:
+@app.patch("/books/{book_id}", response_model=schemas.Book)
+def patch_book(book_id: int, book_update: schemas.BookUpdate,
+               db: Session = Depends(get_db)):
+    patched_book = crud.patch_book(db, book_id, book_update)
+    if patched_book is None:
         raise HTTPException(status_code=404, detail="Book not found")
-    return updated_book
+    return patched_book

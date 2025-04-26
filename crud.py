@@ -30,13 +30,13 @@ def delete_book(db: Session, book_id: int):
     return None
 
 
-def update_book(db: Session, book_id: int, book_update: schemas.BookUpdate):
+def patch_book(db: Session, book_id: int, book_update: schemas.BookUpdate):
     book = db.query(models.Book).filter(models.Book.id == book_id).first()
     if not book:
         return None
 
-    update_data = book_update.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
+    patched_data = book_update.model_dump(exclude_unset=True)
+    for key, value in patched_data.items():
         setattr(book, key, value)
 
     db.commit()
