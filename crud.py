@@ -19,3 +19,12 @@ def get_books(db: Session,
 
 def get_book(db: Session, book_id: int) -> Optional[models.Book]:
     return db.query(models.Book).filter(models.Book.id == book_id).first()
+
+
+def delete_book(db: Session, book_id: int):
+    book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if book:
+        db.delete(book)
+        db.commit()
+        return book
+    return None

@@ -37,3 +37,11 @@ def read_book(book_id: int, db: Session = Depends(get_db)):
     if book is None:
         raise HTTPException(status_code=404, detail="Book not found")
     return book
+
+
+@app.delete("/books/{book_id}", response_model=schemas.Book)
+def remove_book(book_id: int, db: Session = Depends(get_db)):
+    book = crud.delete_book(db, book_id)
+    if book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
