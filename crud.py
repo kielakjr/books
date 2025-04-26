@@ -35,16 +35,9 @@ def update_book(db: Session, book_id: int, book_update: schemas.BookUpdate):
     if not book:
         return None
 
-    if book_update.title:
-        book.title = book_update.title
-    if book_update.author:
-        book.author = book_update.author
-    if book_update.category:
-        book.category = book_update.category
-    if book_update.rating or book_update.rating == 0:
-        book.rating = book_update.rating
-    if book_update.description:
-        book.description = book_update.description
+    update_data = book_update.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(book, key, value)
 
     db.commit()
     db.refresh(book)

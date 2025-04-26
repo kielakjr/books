@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class BookBase(BaseModel):
@@ -14,7 +15,11 @@ class BookCreate(BookBase):
 
 
 class BookUpdate(BookBase):
-    pass
+    title: Optional[str] = None
+    author: Optional[str] = None
+    category: Optional[str] = None
+    rating: Optional[int] = None
+    description: Optional[str] = None
 
 
 class Book(BookBase):
