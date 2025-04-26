@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 
 
@@ -6,8 +6,14 @@ class BookBase(BaseModel):
     title: str = Field(..., min_length=1)
     author: str = Field(..., min_length=1)
     category: str = Field(..., min_length=1)
-    rating: int = Field(..., ge=0, le=10)
+    rating: Optional[float] = None
     description: Optional[str] = None
+
+    @field_validator('rating')
+    def round_rating(cls, v):
+        if v is not None:
+            return round(v, 2)
+        return v
 
 
 class BookCreate(BookBase):
@@ -18,7 +24,7 @@ class BookUpdate(BookBase):
     title: Optional[str] = None
     author: Optional[str] = None
     category: Optional[str] = None
-    rating: Optional[int] = None
+    rating: Optional[float] = None
     description: Optional[str] = None
 
 
@@ -36,7 +42,7 @@ class Review(ReviewBase):
     book_id: int
 
     class Config:
-        orm_mode = True
+        from_attribtues = True
 
 
 class Book(BookBase):
@@ -44,4 +50,4 @@ class Book(BookBase):
     reviews: List[Review] = []
 
     class Config:
-        orm_mode = True
+        from_attribtues = True

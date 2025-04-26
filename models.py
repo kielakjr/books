@@ -10,10 +10,15 @@ class Book(Base):
     title = Column(String, index=True)
     author = Column(String, index=True)
     category = Column(String, index=True)
-    rating = Column(Integer)
     description = Column(String)
 
     reviews = relationship("Review", back_populates="book", cascade="all, delete-orphan")
+
+    @property
+    def rating(self):
+        if not self.reviews:
+            return None
+        return sum(review.rating for review in self.reviews) / len(self.reviews)
 
 
 class Review(Base):

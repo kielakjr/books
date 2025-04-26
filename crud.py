@@ -45,11 +45,12 @@ def patch_book(db: Session, book_id: int, book_update: schemas.BookUpdate):
 
 
 def create_review(db: Session, book_id: int, review: schemas.ReviewCreate):
-    db_review = models.Review(**review.dict(), book_id=book_id)
-    db.add(db_review)
+    review = models.Review(book_id=book_id, rating=review.rating, comment=review.comment)
+    db.add(review)
     db.commit()
-    db.refresh(db_review)
-    return db_review
+    db.refresh(review)
+
+    return review
 
 
 def get_reviews_for_book(db: Session, book_id: int):
