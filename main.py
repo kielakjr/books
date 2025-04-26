@@ -1,5 +1,8 @@
 from fastapi import FastAPI
-from database import Book, session
+from database import engine
+import models
+
+models.Base.metadata.create_all(engine)
 
 app = FastAPI()
 
