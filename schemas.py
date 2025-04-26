@@ -9,22 +9,18 @@ class BookBase(BaseModel):
     rating: Optional[float] = None
     description: Optional[str] = None
 
-    @field_validator('rating')
-    def round_rating(cls, v):
-        if v is not None:
-            return round(v, 2)
-        return v
+
+class BookCreate(BaseModel):
+    title: str = Field(..., min_length=1)
+    author: str = Field(..., min_length=1)
+    category: str = Field(..., min_length=1)
+    description: Optional[str] = None
 
 
-class BookCreate(BookBase):
-    pass
-
-
-class BookUpdate(BookBase):
+class BookUpdate(BaseModel):
     title: Optional[str] = None
     author: Optional[str] = None
     category: Optional[str] = None
-    rating: Optional[float] = None
     description: Optional[str] = None
 
 

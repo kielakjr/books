@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from fastapi import HTTPException
 import models
 import schemas
 
@@ -45,12 +46,26 @@ def patch_book(db: Session, book_id: int, book_update: schemas.BookUpdate):
 
 
 def create_review(db: Session, book_id: int, review: schemas.ReviewCreate):
-    review = models.Review(book_id=book_id, rating=review.rating, comment=review.comment)
-    db.add(review)
-    db.commit()
-    db.refresh(review)
+    book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
 
-    return review
+    db_review = models.Review(comment=review.comment, rating=review.rating, book_id=book_id)
+    db.add(db_review)
+    db.commit()
+    db.refresh(db_review)
+
+    reviews = db.query(models.Review).filter(models.Review.book_id == book_id).all()
+    if reviews:
+        average_rating = sum(r.rating for r in reviews) / len(reviews)
+        book.rating = round(average_rating, 2)
+    else:
+        book.rating = None
+
+    db.commit()
+    db.refresh(book)
+
+    return db_review
 
 
 def get_reviews_for_book(db: Session, book_id: int):
