@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 import models
@@ -20,11 +20,6 @@ def get_db():
         db.close()
 
 
-@app.get("/")
-def index():
-    return {"message": "Hello, DevBook!"}
-
-
 @app.post("/books/", response_model=schemas.Book)
 def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
     return crud.create_book(db=db, book=book)
@@ -34,3 +29,11 @@ def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
 def read_books(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     books = crud.get_books(db, skip=skip, limit=limit)
     return books
+
+
+@app.get("/books/{book_id}", response_model=schemas.Book)
+def read_book(book_id: int, db: Session = Depends(get_db)):
+    book = crud.get_book(db, book_id=book_id)
+    if book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
